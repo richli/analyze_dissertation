@@ -8,10 +8,15 @@ repo="$(pwd)/diss"
 
 # Checkout a local copy
 rm -rf "$repo"
-git clone --no-hardlinks "$orig_repo" "$repo"
+git clone --quiet --no-hardlinks "$orig_repo" "$repo"
 pushd "$repo"
 
+# Note the timestamp for each commit
+echo "Recording commit timestamps"
+git log --no-abbrev-commit --pretty=format:"%H %ai" > ../timestamps.list
+
 # Run texcount for each commit
+echo "Counting words for each commit"
 # git rebase --exec 'ls > ../$(git describe --always).ls' --root
 for rev in $(git rev-list --all); do
     git checkout --quiet "$rev"
@@ -21,9 +26,6 @@ for rev in $(git rev-list --all); do
         texcount -total -brief manuscript/*.tex > ../"$rev".stat
     fi
 done
-
-# Note the timestamp for each commit
-git log --no-abbrev-commit --pretty=format:"%H %ai" > ../timestamps.list
 
 # All done
 popd
