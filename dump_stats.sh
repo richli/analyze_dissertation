@@ -5,6 +5,8 @@
 
 orig_repo="$HOME/mers/git/dissertation"
 repo="$(pwd)/diss"
+timestamps="$(pwd)/timestamps.list"
+word_stats="$(pwd)/word_stats.list"
 
 # Checkout a local copy
 rm -rf "$repo"
@@ -13,11 +15,11 @@ pushd "$repo"
 
 # Note the timestamp for each commit
 echo "Recording commit timestamps"
-git log --no-abbrev-commit --pretty=format:"%H %ai" > ../timestamps.list
+git log --no-abbrev-commit --pretty=format:"%H %ai" > "$timestamps"
 
 # Run texcount for each commit
 echo "Counting words for each commit"
-# git rebase --exec 'ls > ../$(git describe --always).ls' --root
+rm -f "$word_stats"
 revs=($(git rev-list --all))
 i=0
 for rev in "${revs[@]}"; do
@@ -27,7 +29,8 @@ for rev in "${revs[@]}"; do
     # The first few commits don't have a "manuscript" directory, so this checks
     # for the directory existence to prevent failure of the globbing
     if [[ -d "manuscript" ]]; then
-        texcount -total -brief manuscript/*.tex > ../"$rev".stat
+        echo -n "$rev " >> "$word_stats"
+        texcount -total -brief manuscript/*.tex >> "$word_stats"
     fi
 done
 
