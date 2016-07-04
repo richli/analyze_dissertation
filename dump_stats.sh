@@ -30,7 +30,7 @@ for rev in "${revs[@]}"; do
     # for the directory existence to prevent failure of the globbing
     if [[ -d "manuscript" ]]; then
         echo -n "$rev," >> "$word_stats"
-        texcount -total -brief manuscript/*.tex >> "$word_stats"
+        texcount -total -brief -sum manuscript/*.tex >> "$word_stats"
     fi
 done
 
